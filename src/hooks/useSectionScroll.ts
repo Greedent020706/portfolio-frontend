@@ -1,9 +1,27 @@
-import { useRef, useState, useEffect } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { useScroll, useMotionValueEvent } from "motion/react";
 
-export function useSectionScroll(sectionCount: number, sectionIds: string[]) {
+interface HasSlug {
+  slug: string;
+}
+
+function scrollToIndex(
+  ref: RefObject<HTMLDivElement | null>,
+  count: number,
+  index: number,
+) {
+  const el = ref.current;
+  if (!el || count === 0) return;
+  const sectionHeight = el.offsetHeight / count;
+  // +1: sin él caes justo en el borde y el redondeo puede dejarte
+  // en la sección anterior.
+  window.scrollTo({ top: el.offsetTop + index * sectionHeight + 1 });
+}
+
+export function useSectionScroll(sections: HasSlug[]) {
   const ref = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const count = sections.length;
 
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -11,38 +29,38 @@ export function useSectionScroll(sectionCount: number, sectionIds: string[]) {
   });
 
   useMotionValueEvent(scrollYProgress, "change", (progress) => {
-    // Math.min: cuando progress llega justo a 1, floor(1 * 5) daría 5,
-    // que está fuera de rango en un array de 5 elementos.
-    const next = Math.min(sectionCount - 1, Math.floor(progress * sectionCount));
-
-    // Guard: scrollYProgress cambia decenas de veces por segundo.
-    // Sin esto pedirías un render en cada frame.
+    // Math.min: con progress === 1, floor(1 * count) se sale del array.
+    const next = Math.min(count - 1, Math.floor(progress * count));
+    // Guard: solo re-renderiza cuando cambia de sección, no en cada frame.
     setActiveIndex((prev) => (prev === next ? prev : next));
   });
 
-  function scrollToSection(index: number) {
-    const el = ref.current;
-    if (!el) return;
-    const sectionHeight = el.offsetHeight / sectionCount;
-    window.scrollTo({ top: el.offsetTop + index * sectionHeight + 1 });
-  }
-
+  // Ir a la sección del hash al cargar y cuando el usuario cambia el hash.
   useEffect(() => {
-    const hash = window.location.hash.slice(1);
-    if (!hash) return;
-    const index = sectionIds.indexOf(hash);
-    if (index >= 0) {
-      // rAF: esperar a que el layout esté calculado
-      requestAnimationFrame(() => scrollToSection(index));
+    function goToHash() {
+      const slug = window.location.hash.slice(1);
+      const index = sections.findIndex((s) => s.slug === slug);
+      if (index >= 0) {
+        // rAF: esperar a que el layout tenga su altura final.
+        requestAnimationFrame(() => scrollToIndex(ref, sections.length, index));
+      }
     }
-  }, []);
+    goToHash();
+    window.addEventListener("hashchange", goToHash);
+    return () => window.removeEventListener("hashchange", goToHash);
+  }, [sections]);
 
+  // Reflejar la sección activa en la URL sin ensuciar el historial.
   useEffect(() => {
-  const id = sectionIds[activeIndex];
-  if (id && window.location.hash !== `#${id}`) {
-    window.history.replaceState(null, "", `#${id}`);
+    const slug = sections[activeIndex]?.slug;
+    if (slug && window.location.hash !== `#${slug}`) {
+      window.history.replaceState(null, "", `#${slug}`);
+    }
+  }, [activeIndex, sections]);
+
+  function scrollToSection(index: number) {
+    scrollToIndex(ref, count, index);
   }
-}, [activeIndex]);
 
   return { ref, activeIndex, scrollYProgress, scrollToSection };
 }
