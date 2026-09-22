@@ -14,6 +14,7 @@ export interface ApiSkill {
   id: number;
   name: string;
   category: string;
+  icon: string | null;
 }
 
 export type SectionKind = "hero" | "text" | "skills" | "projects" | "contact";

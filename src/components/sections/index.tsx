@@ -49,8 +49,16 @@ export function Stack({ section }: SectionProps) {
               {items?.map((skill) => (
                 <li
                   key={skill.id}
-                  className="rounded border border-ink/20 px-3 py-1 text-sm"
+                  className="flex items-center gap-2 rounded border border-ink/20 px-3 py-1 text-sm"
                 >
+                  {skill.icon && (
+                    <img
+                      src={skill.icon}
+                      alt=""
+                      className="h-5 w-5 object-contain"
+                      loading="lazy"
+                    />
+                  )}
                   {skill.name}
                 </li>
               ))}
