@@ -1,6 +1,7 @@
 import type { ComponentType } from "react";
 import type { ApiSection, SectionKind, SiteData } from "../../lib/api";
 import { ProjectCard } from "../ProjectoCards";
+import { ContactForm } from "../ContactForm";
 
 export interface SectionProps {
   section: ApiSection;
@@ -85,16 +86,12 @@ export function Proyectos({ section }: SectionProps) {
   );
 }
 
-export function Contacto({ section, profile }: SectionProps) {
+export function Contacto({ section }: SectionProps) {
   return (
     <>
       <Title section={section} />
       {section.body && <p className="mt-3 max-w-prose">{section.body}</p>}
-      {profile?.email && (
-        <a href={`mailto:${profile.email}`} className="mt-4 inline-block underline">
-          {profile.email}
-        </a>
-      )}
+      <ContactForm />
     </>
   );
 }

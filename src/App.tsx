@@ -100,6 +100,7 @@ function Portfolio({ site }: { site: SiteData }) {
       {/* Todo el contenido, accesible para lectores de pantalla y Ctrl+F */}
       <div className="sr-only">
         {sections.map((s) => {
+          if (s.kind === "contact") return null;
           const S = sectionComponents[s.kind];
           return (
             <section key={s.slug} aria-label={s.nav_label}>
