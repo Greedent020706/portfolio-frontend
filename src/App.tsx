@@ -38,7 +38,7 @@ export default function App() {
     return (
       <div
         role="status"
-        className="grid min-h-[100dvh] place-items-center bg-paper text-ink"
+        className="grid min-h-[100dvh] place-items-center font-mono text-sm text-slate-400"
       >
         <p>Cargando…</p>
       </div>
@@ -47,7 +47,7 @@ export default function App() {
 
   if (site.sections.length === 0) {
     return (
-      <div className="grid min-h-[100dvh] place-items-center bg-paper text-ink">
+      <div className="grid min-h-[100dvh] place-items-center font-mono text-sm text-slate-400">
         <p>No hay secciones visibles.</p>
       </div>
     );
@@ -67,7 +67,14 @@ function Portfolio({ site }: { site: SiteData }) {
   const Section = sectionComponents[active.kind];
 
   return (
-    <main className="bg-paper text-ink">
+    // isolate: crea un contexto de apilamiento propio para que los fondos
+    // con -z-10 queden detrás del contenido pero delante del body.
+    <main className="relative isolate text-slate-200 selection:bg-cyan-500/30 selection:text-cyan-200">
+      <div
+        aria-hidden="true"
+        className="grid-overlay pointer-events-none fixed inset-0 -z-10"
+      />
+
       <ProgressNav
         sections={sections}
         activeIndex={activeIndex}
@@ -78,7 +85,9 @@ function Portfolio({ site }: { site: SiteData }) {
         <motion.div
           style={{ y: reduce ? 0 : bgY }}
           aria-hidden="true"
-          className="absolute inset-0 -z-10 bg-gradient-to-b from-accent/10 to-transparent"
+          // 150%: el parallax sube la capa un 30% de SU altura; con menos
+          // se vería el borde inferior en la última sección.
+          className="ambient-bg absolute inset-x-0 top-0 -z-10 h-[150%]"
         />
 
         <AnimatePresence mode="wait">
@@ -88,9 +97,9 @@ function Portfolio({ site }: { site: SiteData }) {
             animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: -40 }}
             transition={{ duration: reduce ? 0 : 0.35, ease: "easeOut" }}
-            className="grid h-full place-items-center px-8 text-center"
+            className="grid h-full place-items-center px-6 text-center sm:px-16"
           >
-            <div>
+            <div className="w-full">
               <Section section={active} profile={profile} />
             </div>
           </motion.div>

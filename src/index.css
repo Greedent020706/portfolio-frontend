@@ -1,17 +1,98 @@
 @import "tailwindcss";
 
+/* Paleta y tipografía del diseño "Neon Dark Portfolio Design" (Stitch). */
 @theme {
-  --color-ink: oklch(0.18 0.01 260);
-  --color-paper: oklch(0.97 0.005 260);
-  --color-accent: oklch(0.62 0.18 255);
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --color-bg: #080b11;        /* fondo de página */
+  --color-surface: #0b101b;   /* interior de tarjetas con borde neón */
+  --color-neon-cyan: #00f2fe;
+  --color-neon-blue: #3b82f6;
+  --color-neon-purple: #8b5cf6;
+  --color-neon-pink: #ec4899;
 }
 
 html {
   scroll-behavior: smooth;
 }
 
+body {
+  background-color: var(--color-bg);
+  color: #f1f5f9;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+/* Ángulo animable: permite girar el conic-gradient del borde neón. */
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes rotate-glow {
+  to {
+    --angle: 360deg;
+  }
+}
+
+@layer components {
+  /* Manchas de color difuminadas detrás de todo. */
+  .ambient-bg {
+    background-image:
+      radial-gradient(circle at 15% 20%, rgb(59 130 246 / 0.12) 0%, transparent 45%),
+      radial-gradient(circle at 85% 65%, rgb(139 92 246 / 0.13) 0%, transparent 50%),
+      radial-gradient(circle at 50% 90%, rgb(0 242 254 / 0.08) 0%, transparent 45%);
+  }
+
+  /* Cuadrícula sutil de 50px. */
+  .grid-overlay {
+    background-size: 50px 50px;
+    background-image:
+      linear-gradient(to right, rgb(255 255 255 / 0.02) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(255 255 255 / 0.02) 1px, transparent 1px);
+  }
+
+  /*
+   * Borde neón giratorio: el contenedor pinta el degradado y su padding
+   * hace de grosor del borde. El hijo directo debe llevar fondo propio
+   * (p. ej. bg-surface) para tapar el centro.
+   */
+  .neon-frame {
+    padding: 1.5px;
+    background: conic-gradient(
+      from var(--angle),
+      var(--color-neon-cyan),
+      var(--color-neon-blue),
+      var(--color-neon-purple),
+      var(--color-neon-pink),
+      var(--color-neon-cyan)
+    );
+    animation: rotate-glow 5s linear infinite;
+  }
+
+  /* Tarjeta de cristal esmerilado. */
+  .glass-card {
+    background: rgb(15 23 42 / 0.65);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgb(255 255 255 / 0.08);
+    box-shadow: 0 10px 30px -10px rgb(0 0 0 / 0.5);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .glass-card:hover {
+    border-color: rgb(0 242 254 / 0.35);
+    box-shadow: 0 12px 35px -10px rgb(0 242 254 / 0.15);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .neon-frame {
+    animation: none;
   }
 }
