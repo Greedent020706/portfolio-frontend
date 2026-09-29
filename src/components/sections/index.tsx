@@ -1,7 +1,7 @@
 import type { ComponentType } from "react";
 import type { ApiSection, SectionKind, SiteData } from "../../lib/api";
 import { ProjectCard } from "../ProjectoCards";
-import { ContactForm } from "../ContactForm";
+import { ContactLinks } from "../ContactLinks";
 
 export interface SectionProps {
   section: ApiSection;
@@ -152,11 +152,11 @@ export function Proyectos({ section }: SectionProps) {
   );
 }
 
-export function Contacto({ section }: SectionProps) {
+export function Contacto({ section, profile }: SectionProps) {
   return (
     <div className="mx-auto max-w-2xl">
       <Title section={section} subtitle={section.body} />
-      <ContactForm />
+      <ContactLinks profile={profile} />
     </div>
   );
 }

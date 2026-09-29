@@ -38,6 +38,8 @@ export interface SiteData {
     role: string;
     summary: string;
     email: string;
+    whatsapp: string;
+    github: string;
     avatar: string | null;
   } | null;
   sections: ApiSection[];
@@ -53,30 +55,5 @@ export async function getSite(): Promise<SiteData> {
   } catch (error) {
     console.warn("API no disponible, usando datos locales:", error);
     return fallbackSite;
-  }
-}
-
-export interface ContactPayload {
-  name: string;
-  email: string;
-  message: string;
-  website: string;
-}
-
-export type ContactResult = "ok" | "invalid" | "throttled" | "error";
-
-export async function sendContact(payload: ContactPayload): Promise<ContactResult> {
-  try {
-    const res = await fetch(`${API_URL}/api/contact/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (res.ok) return "ok";
-    if (res.status === 400) return "invalid";
-    if (res.status === 429) return "throttled";
-    return "error";
-  } catch {
-    return "error";
   }
 }

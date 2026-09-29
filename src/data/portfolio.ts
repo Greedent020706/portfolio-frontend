@@ -18,6 +18,8 @@ export const fallbackSite: SiteData = {
       "soluciones web eficientes, aprender nuevas tecnologías y convertir ideas en " +
       "productos funcionales.",
     email: "carlosalejandroremonortiz@gmail.com",
+    whatsapp: "",
+    github: "",
     avatar: null,
   },
   sections: [
