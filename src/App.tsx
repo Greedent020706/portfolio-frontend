@@ -97,7 +97,14 @@ function Portfolio({ site }: { site: SiteData }) {
             animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: -40 }}
             transition={{ duration: reduce ? 0 : 0.35, ease: "easeOut" }}
-            className="grid h-full place-items-center px-6 text-center sm:px-16"
+            // grid-cols-1 = minmax(0, 1fr): sin él la columna crece hasta el
+            // ancho del texto más largo (p. ej. el correo) y se sale en móvil.
+            // overflow-y-auto: red de seguridad si una sección no cabe en una
+            // pantalla bajita; se puede desplazar por dentro y, al llegar al
+            // final, el scroll sigue a la página (siguiente sección).
+            // items-center-safe: centra, pero si el contenido es más alto que
+            // la pantalla lo pega arriba en vez de cortar la parte de arriba.
+            className="grid h-full grid-cols-1 items-center-safe justify-items-center overflow-y-auto px-6 py-8 text-center sm:px-16"
           >
             <div className="w-full">
               <Section section={active} profile={profile} />

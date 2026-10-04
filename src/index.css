@@ -24,6 +24,14 @@ body {
   overflow-x: hidden;
 }
 
+/* Tailwind v4 deja los botones con cursor normal; aquí vuelve la "manita". */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
 /* Ángulo animable: permite girar el conic-gradient del borde neón. */
 @property --angle {
   syntax: "<angle>";
@@ -87,12 +95,25 @@ body {
   }
 }
 
+/* Entrada suave del modal de proyectos. */
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+
+.project-modal[open] {
+  animation: modal-in 0.2s ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
 
-  .neon-frame {
+  .neon-frame,
+  .project-modal[open] {
     animation: none;
   }
 }

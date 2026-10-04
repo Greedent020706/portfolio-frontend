@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 import type { ApiSection, SectionKind, SiteData } from "../../lib/api";
-import { ProjectCard } from "../ProjectoCards";
+import { ProjectCarousel } from "../ProjectCarousel";
 import { ContactLinks } from "../ContactLinks";
 
 export interface SectionProps {
@@ -96,19 +96,31 @@ export function SobreMi({ section, profile }: SectionProps) {
 
 export function Stack({ section }: SectionProps) {
   const skills = section.content.skills ?? [];
-  const groups = Object.groupBy(skills, (s) => s.category || "Otros");
+  const groups = Object.entries(Object.groupBy(skills, (s) => s.category || "Otros"));
+
+  // En móvil la rejilla va a 2 columnas para que quepa en una pantalla.
+  // Las categorías con muchas tecnologías ocupan el ancho completo, y si las
+  // "pequeñas" quedan impares, la última también, para no dejar un hueco.
+  const isWide = (count: number) => count > 4;
+  const narrow = groups.filter(([, items]) => !isWide(items?.length ?? 0));
+  const lastNarrow = narrow.length % 2 === 1 ? narrow.at(-1)?.[0] : undefined;
 
   return (
     <div className="mx-auto max-w-5xl">
       <Title section={section} subtitle={section.body} />
-      <div className="grid gap-3 text-left sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
-        {Object.entries(groups).map(([category, items], i) => {
+      <div className="grid grid-cols-2 gap-2.5 text-left sm:gap-4 lg:grid-cols-3">
+        {groups.map(([category, items], i) => {
           const color = categoryColors[i % categoryColors.length];
+          const fullRow = isWide(items?.length ?? 0) || category === lastNarrow;
           return (
-            <div key={category} className="glass-card rounded-2xl p-4 sm:p-5">
-              <div className="mb-3 flex sm:mb-4 items-center gap-2">
-                <span className={`h-2 w-2 rounded-full ${color.dot}`} />
-                <h3 className={`font-mono text-xs font-bold uppercase tracking-widest ${color.text}`}>
+            <div
+              key={category}
+              // sm:col-span-1: a partir de tablet todas vuelven a ocupar una celda.
+              className={`glass-card rounded-2xl p-3 sm:col-span-1 sm:p-5 ${fullRow ? "col-span-2" : ""}`}
+            >
+              <div className="mb-2 flex items-center gap-2 sm:mb-4">
+                <span className={`h-2 w-2 shrink-0 rounded-full ${color.dot}`} />
+                <h3 className={`font-mono text-[11px] font-bold uppercase tracking-wider sm:text-xs sm:tracking-widest ${color.text}`}>
                   {category}
                 </h3>
               </div>
@@ -116,7 +128,7 @@ export function Stack({ section }: SectionProps) {
                 {items?.map((skill) => (
                   <li
                     key={skill.id}
-                    className="flex items-center gap-2 rounded-lg border border-slate-700/60 bg-slate-900/90 px-2.5 py-1 text-xs font-medium text-slate-200 sm:px-3 sm:py-1.5 transition-colors hover:border-cyan-400/50 hover:bg-slate-800"
+                    className="flex items-center gap-1.5 rounded-lg border border-slate-700/60 bg-slate-900/90 px-2 py-1 text-xs sm:gap-2 font-medium text-slate-200 sm:px-3 sm:py-1.5 transition-colors hover:border-cyan-400/50 hover:bg-slate-800"
                   >
                     {skill.icon && (
                       <img
@@ -143,11 +155,7 @@ export function Proyectos({ section }: SectionProps) {
   return (
     <div className="mx-auto max-w-6xl">
       <Title section={section} subtitle={section.body} />
-      <div className="grid items-stretch gap-3 sm:gap-6 md:grid-cols-3">
-        {projects.map((p) => (
-          <ProjectCard key={p.id} project={p} />
-        ))}
-      </div>
+      <ProjectCarousel projects={projects} />
     </div>
   );
 }

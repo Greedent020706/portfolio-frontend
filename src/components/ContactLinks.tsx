@@ -75,7 +75,7 @@ export function ContactLinks({ profile }: { profile: SiteData["profile"] }) {
   if (links.length === 0) return null;
 
   return (
-    <ul className="mx-auto mt-8 grid w-full max-w-xl gap-3 text-left sm:gap-4">
+    <ul className="mx-auto mt-8 grid w-full max-w-xl grid-cols-1 gap-3 text-left sm:gap-4">
       {links.map((link) => {
         const external = !link.href.startsWith("mailto:");
         return (
